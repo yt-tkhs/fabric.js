@@ -13902,8 +13902,9 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
      * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
      * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 2.0.0
+     * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
      * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
-     * @see {@link http://jsfiddle.net/fabricjs/NfZVb/|jsFiddle demo}
+     * @see {@link https://jsfiddle.net/xsjua1rd/ demo}
      * @example <caption>Generate jpeg dataURL with lower quality</caption>
      * var dataURL = canvas.toDataURL({
      *   format: 'jpeg',
@@ -13921,6 +13922,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * var dataURL = canvas.toDataURL({
      *   format: 'png',
      *   multiplier: 2
+     * });
+     * @example <caption>Generate dataURL with objects that overlap a specified object</caption>
+     * var myObject;
+     * var dataURL = canvas.toDataURL({
+     *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
      * });
      */
     toDataURL: function (options) {
@@ -13940,29 +13946,31 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * This is an intermediary step used to get to a dataUrl but also it is useful to
      * create quick image copies of a canvas without passing for the dataUrl string
      * @param {Number} [multiplier] a zoom factor.
-     * @param {Object} [cropping] Cropping informations
-     * @param {Number} [cropping.left] Cropping left offset.
-     * @param {Number} [cropping.top] Cropping top offset.
-     * @param {Number} [cropping.width] Cropping width.
-     * @param {Number} [cropping.height] Cropping height.
+     * @param {Object} [options] Cropping informations
+     * @param {Number} [options.left] Cropping left offset.
+     * @param {Number} [options.top] Cropping top offset.
+     * @param {Number} [options.width] Cropping width.
+     * @param {Number} [options.height] Cropping height.
+     * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
      */
-    toCanvasElement: function(multiplier, cropping) {
+    toCanvasElement: function (multiplier, options) {
       multiplier = multiplier || 1;
-      cropping = cropping || { };
-      var scaledWidth = (cropping.width || this.width) * multiplier,
-          scaledHeight = (cropping.height || this.height) * multiplier,
+      options = options || { };
+      var scaledWidth = (options.width || this.width) * multiplier,
+          scaledHeight = (options.height || this.height) * multiplier,
           zoom = this.getZoom(),
           originalWidth = this.width,
           originalHeight = this.height,
           newZoom = zoom * multiplier,
           vp = this.viewportTransform,
-          translateX = (vp[4] - (cropping.left || 0)) * multiplier,
-          translateY = (vp[5] - (cropping.top || 0)) * multiplier,
+          translateX = (vp[4] - (options.left || 0)) * multiplier,
+          translateY = (vp[5] - (options.top || 0)) * multiplier,
           originalInteractive = this.interactive,
           newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
           originalRetina = this.enableRetinaScaling,
           canvasEl = fabric.util.createCanvasElement(),
-          originalContextTop = this.contextTop;
+          originalContextTop = this.contextTop,
+          objectsToRender = options.filter ? this._objects.filter(options.filter) : this._objects;
       canvasEl.width = scaledWidth;
       canvasEl.height = scaledHeight;
       this.contextTop = null;
@@ -13972,7 +13980,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
       this.width = scaledWidth;
       this.height = scaledHeight;
       this.calcViewportBoundaries();
-      this.renderCanvas(canvasEl.getContext('2d'), this._objects);
+      this.renderCanvas(canvasEl.getContext('2d'), objectsToRender);
       this.viewportTransform = vp;
       this.width = originalWidth;
       this.height = originalHeight;
@@ -17164,6 +17172,79 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       parent = parent.group || parent.canvas;
     }
     return false;
+  },
+
+  /**
+   *
+   * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
+   * @returns {(fabric.Object | fabric.StaticCanvas)[]} ancestors from bottom to top
+   */
+  getAncestors: function (strict) {
+    var ancestors = [];
+    var parent = this.group || (!strict ? this.canvas : undefined);
+    while (parent) {
+      ancestors.push(parent);
+      parent = parent.group || (!strict ? parent.canvas : undefined);
+    }
+    return ancestors;
+  },
+
+  /**
+   *
+   * @param {fabric.Object} other
+   * @returns {{ index: number, otherIndex: number, ancestors: fabric.Object[] }} ancestors may include the passed objects if one is an ancestor of the other resulting in index of -1
+   */
+  findCommonAncestors: function (other) {
+    if (this === other) {
+      return true;
+    }
+    else if (!other) {
+      return false;
+    }
+    var ancestors = this.getAncestors();
+    ancestors.unshift(this);
+    var otherAncestors = other.getAncestors();
+    otherAncestors.unshift(other);
+    for (var i = 0, ancestor; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      for (var j = 0; j < otherAncestors.length; j++) {
+        if (ancestor === otherAncestors[j] && !(ancestor instanceof fabric.StaticCanvas)) {
+          return {
+            index: i - 1,
+            otherIndex: j - 1,
+            ancestors: ancestors.slice(i)
+          };
+        }
+      }
+    }
+  },
+
+  /**
+   *
+   * @param {fabric.Object} other
+   * @returns {boolean}
+   */
+  hasCommonAncestors: function (other) {
+    return !!this.findCommonAncestors(other);
+  }
+});
+
+
+fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prototype */ {
+
+  /**
+   * Moves an object to the bottom of the stack of drawn objects
+   * @return {fabric.Object} thisArg
+   * @chainable
+   */
+  sendToBack: function() {
+    if (this.group) {
+      fabric.StaticCanvas.prototype.sendToBack.call(this.group, this);
+    }
+    else if (this.canvas) {
+      this.canvas.sendToBack(this);
+    }
+    return this;
   },
 
   /**
