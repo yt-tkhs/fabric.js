@@ -1,7 +1,8 @@
 import { NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import * as fabric from 'fabric';
+import { useCanvas } from '../components/Canvas';
 
 // https://nextjs.org/docs/advanced-features/dynamic-import#with-no-ssr
 const Canvas = dynamic(
@@ -39,10 +40,18 @@ const IndexPage: NextPage = () => {
     animate(1);
   }, []);
 
+  const ref = useRef<HTMLCanvasElement>(null);
+  const [canvasRef, setCanvasElRef] = useCanvas(ref, onLoad);
+
   return (
-    <div className="position-relative">
-      <Canvas onLoad={onLoad} />
-    </div>
+    <>
+      <div className="position-relative">
+        <canvas ref={setCanvasElRef} />
+      </div>
+      <div className="position-relative">
+        <Canvas onLoad={onLoad} />
+      </div>
+    </>
   );
 };
 
