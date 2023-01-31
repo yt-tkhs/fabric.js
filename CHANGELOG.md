@@ -3,6 +3,7 @@
 ## [next]
 
 - ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
+- chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
 - chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)
 - chore(): move and rename text & itext files and organize as folders, rename mixins [#8620](https://github.com/fabricjs/fabric.js/pull/8620)
 - chore(TS): type IText, IText behavior, IText click behavior [#8610](https://github.com/fabricjs/fabric.js/pull/8610)
