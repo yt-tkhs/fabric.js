@@ -1,5 +1,5 @@
 import http from 'http';
-import * as fabric from 'fabric/node';
+import * as fabric from 'fabric';
 
 const port = Number(process.argv[2]);
 
