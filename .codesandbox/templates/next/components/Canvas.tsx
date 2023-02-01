@@ -1,5 +1,6 @@
 import * as fabric from 'fabric';
 import React, { useCallback, useEffect, useRef } from 'react';
+import { useLoadCanvas } from './init';
 
 const DEV_MODE = process.env.NODE_ENV === 'development';
 
@@ -60,10 +61,13 @@ export function useCanvas(
 export const Canvas = React.forwardRef<
   HTMLCanvasElement,
   {
-    onLoad?: (canvas: fabric.Canvas) => any;
     saveState?: boolean;
   }
->(({ onLoad, saveState }, ref) => {
-  const [canvasRef, setCanvasElRef] = useCanvas(ref, onLoad, saveState);
+>(({ saveState }, ref) => {
+  const [canvasRef, setCanvasElRef] = useCanvas(
+    ref,
+    useLoadCanvas(),
+    saveState
+  );
   return <canvas ref={setCanvasElRef} />;
 });
