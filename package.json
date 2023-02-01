@@ -115,5 +115,16 @@
   },
   "module": "./dist/fabric.js",
   "main": "./dist/fabric.umd.js",
-  "types": "./dist/fabric.d.ts"
+  "types": "./dist/fabric.d.ts",
+  "browser": {
+    "canvas": false,
+    "fs": false,
+    "jsdom": false,
+    "jsdom/lib/jsdom/living/generated/utils": false,
+    "jsdom/lib/jsdom/utils": false,
+    "http": false,
+    "https": false,
+    "xmldom": false,
+    "url": false
+  }
 }
