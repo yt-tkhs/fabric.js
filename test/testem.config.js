@@ -6,7 +6,7 @@
 module.exports = {
   framework: 'qunit',
   serve_files: [
-    'dist/fabric.cjs',
+    'dist/index.cjs',
     'test/lib/assert.js'
   ],
   styles: [
@@ -38,7 +38,7 @@ module.exports = {
     'Firefox'
   ],
   tap_failed_tests_only: !Number(process.env.VERBOSE) || false,
-  ignore_missing_launchers: Number(process.env.IGNORE_MISSING_LAUNCHERS) || false,
+  ignore_missing_launchers: false,
   qunit: {
     filter: process.env.QUNIT_FILTER || null,
   },
