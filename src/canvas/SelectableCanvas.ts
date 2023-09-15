@@ -831,8 +831,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Function used to search objects for a object containing {@link pointer}
+   * Search objects for an object containing {@link pointer}
+   * depending on the tree's configuration (`subTargetCheck`, `interactive`, `selectable`)
+   *
    * @see {@link findTargetsTraversal}
+   *
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Object} [pointer] canvas element plane coordinates to check
    * @return {FabricObject} **top most selectable object on screen** that contains {@link pointer}
@@ -846,10 +849,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     });
 
     const found = targets.findIndex((target) => {
-      return (
-        !target.group ||
-        (!(target.group instanceof ActiveSelection) && target.group.interactive)
-      );
+      return !target.group || target.group.interactive;
     });
 
     if (found > -1) {
