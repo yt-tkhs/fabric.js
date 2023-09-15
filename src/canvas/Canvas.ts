@@ -399,7 +399,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * Override at will
    */
   protected findDragTargets(e: DragEvent) {
-    this.targets = [];
     const target = this.searchPossibleTargets(
       this._objects,
       this.getPointer(e, true)
