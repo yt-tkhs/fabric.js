@@ -727,7 +727,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
       // check pointer is over active selection and possibly perform `subTargetCheck`
       const { target: selectedTarget, targets: selectedTargets } =
-        this.searchPossibleTargets([activeObject], pointer);
+        this.findTargets([activeObject], pointer);
 
       if (selectedTarget && aObjects.length > 1) {
         // active selection does not select sub targets like normal groups
@@ -743,7 +743,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           );
           return activeObject;
         } else {
-          const { target, targets: canvasTargets } = this.searchPossibleTargets(
+          const { target, targets: canvasTargets } = this.findTargets(
             this._objects,
             pointer
           );
@@ -769,10 +769,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       }
     }
 
-    const { target, targets } = this.searchPossibleTargets(
-      this._objects,
-      pointer
-    );
+    const { target, targets } = this.findTargets(this._objects, pointer);
     this.targets = target ? targets.slice(0, targets.indexOf(target)) : targets;
     return target;
   }
@@ -814,9 +811,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Search for objects containing {@link pointer}.
-   * Search is not greedy, returning once a hit is found.
-   * @param {Array} [objects] objects array to look into
-   * @param {Object} [pointer] point coordinates to check
+   *
+   * @param {FabricObject[]} objects objects array to look into
+   * @param {Point} pointer point canvas element plane coordinates to check
    * @param {boolean} [param2.searchStrategy] strategy
    * @returns {FabricObject[]} path of objects starting from **top most** object on screen.
    */
@@ -854,13 +851,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Search objects for an object containing {@link pointer}
    * depending on the tree's configuration (`subTargetCheck`, `interactive`, `selectable`)
    *
-   * @see {@link findTargetsTraversal}
+   * @see {@link findTarget} and {@link findTargetsTraversal}
    *
-   * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] canvas element plane coordinates to check
+   * @param {FabricObject[]} objects objects array to look into
+   * @param {Point} pointer canvas element plane coordinates to check
    * @return {FabricObject} **top most selectable object on screen** that contains {@link pointer}
    */
-  searchPossibleTargets(
+  findTargets(
     objects: FabricObject[],
     pointer: Point,
     {
@@ -881,6 +878,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       target,
       targets,
     };
+  }
+
+  /**
+   * @deprecated use {@link findTargets} instead
+   */
+  searchPossibleTargets(objects: FabricObject[], pointer: Point) {
+    return this.findTargets(objects, pointer).target;
   }
 
   /**
