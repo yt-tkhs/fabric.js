@@ -847,13 +847,18 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const targets = this.findTargetsTraversal(objects, pointer, {
       searchStrategy: 'first-hit',
     });
-    this.targets.push(...targets);
     const found = targets.findIndex((target) => {
       const parent = target.getParent(true);
       return !parent || parent.interactive;
     });
-    this.targets = targets.slice(0, found);
-    return targets[found];
+
+    if (found > -1) {
+      this.targets = targets.slice(0, found);
+      return targets[found];
+    } else {
+      this.targets = targets;
+      return undefined;
+    }
   }
 
   /**
