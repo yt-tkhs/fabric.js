@@ -368,6 +368,15 @@ describe('Event targets', () => {
           target: other,
           targets: [other],
         });
+
+        expect(
+          canvas.findTargets(canvas.getActiveObjects(), new Point(), {
+            searchStrategy: 'search-all',
+          })
+        ).toEqual({
+          target: other,
+          targets: [other, subTarget, target],
+        });
       }
     );
 
