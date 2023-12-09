@@ -115,7 +115,10 @@ export class Group
    */
   constructor(
     objects: FabricObject[] = [],
-    options: Partial<GroupProps> = {},
+    {
+      layoutManager = new LayoutManager(),
+      ...options
+    }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
   ) {
     // @ts-expect-error options error
@@ -136,9 +139,7 @@ export class Group
     });
 
     // perform initial layout
-    const layoutManager =
-      // not destructured on purpose here.
-      options.layoutManager || new LayoutManager();
+    this.layoutManager = layoutManager;
     layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       objectsRelativeToGroup,
@@ -147,7 +148,6 @@ export class Group
       x: options.left,
       y: options.top,
     });
-    this.layoutManager = layoutManager;
   }
 
   /**
