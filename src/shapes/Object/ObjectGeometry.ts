@@ -178,6 +178,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     );
   }
 
+  isStrokeAccountedForInDimensions() {
+    return false;
+  }
+
   /**
    * @return {Point[]} [tl, tr, br, bl] in the scene plane
    */

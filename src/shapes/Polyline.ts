@@ -205,6 +205,10 @@ export class Polyline<
       );
   }
 
+  isStrokeAccountedForInDimensions() {
+    return this.exactBoundingBox;
+  }
+
   /**
    * @override stroke is taken in account in size
    */
