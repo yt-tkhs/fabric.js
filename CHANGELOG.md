@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): perform layout on poly change [#9537](https://github.com/fabricjs/fabric.js/pull/9537)
 - test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
 
 ## [6.0.0-beta16]
