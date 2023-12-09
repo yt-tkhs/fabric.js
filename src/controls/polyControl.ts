@@ -13,7 +13,7 @@ import type {
 import { getLocalPoint } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 
-const ACTION_NAME: TModificationEvents = 'polyChanged';
+const ACTION_NAME: TModificationEvents = 'modifyPoly';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
