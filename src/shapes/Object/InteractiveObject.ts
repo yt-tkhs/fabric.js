@@ -11,6 +11,8 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../../util/misc/matrix';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
+import { sendVectorToPlane } from '../../util/misc/planeChange';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
@@ -19,7 +21,6 @@ import type { ControlRenderingStyleOverride } from '../../controls/controlRender
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
-import { makeBoundingBoxFromPoints, sendVectorToPlane } from '../../util';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
